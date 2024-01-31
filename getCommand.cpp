@@ -1,17 +1,69 @@
 //команди передані по каналах зв'язку
 #include <main.h>
 #pragma once
-
+// рпереводимо цифру в опис режиму (назви кліматичної карти)
+void read_routine_feeding() {
+   switch (incubator_1.routing){
+  case 1: //  режим утримання бройлера
+          // lcd.print(myText[20]);
+        Serial.println(myText[20]);
+    break;
+  case 2:// параметри утримання несучок
+         //lcd.print(myText[34]); 
+         Serial.println(myText[34]);
+    break;
+  case 3:// параметри утримання качок
+         //lcd.print(myText[35]);
+         Serial.println(myText[35]);
+    break;
+  case 4:// параметри утримання  індиків
+         //lcd.print(myText[36]);
+        Serial.println(myText[36]);
+    break;
+ case 5:// параметри утримання гуси фазанів
+        //lcd.print(myText[37]);
+        Serial.println(myText[37]);
+    break;
+ case 6:// параметри утримання  перепелів 
+        //lcd.print(myText[38]);
+        Serial.println(myText[38]);
+    break;
+ case 7:// параметри утримання цесарки
+        //lcd.print(myText[39]);
+        Serial.println(myText[39]);
+    break;
+ case 8:// параметри утримання фазан
+        //lcd.print(myText[40]);
+        Serial.println(myText[40]);
+    break;
+ case 9:// параметри утримання ручна
+        //lcd.print(myText[41]);
+        Serial.println(myText[41]);
+    break;
+   }
+}
 
 void read_Comand() {
-  
-  if (((bluetoothCommand>= 1)&&(bluetoothCommand<=9))||((NRF_message>=1)&&(NRF_message<=9)))
+  //команди
+  if (((bluetoothCommand>= 1)&&(bluetoothCommand<=7))||((NRF_message>=1)&&(NRF_message<=7))||((I2C_message>=1)&&(I2C_message<=7)))
       {Incubatordata.routing=(bluetoothCommand+NRF_message);// в структуру записуємо номер режиму інкубації
-      EEPROM.put(201,Incubatordata.routing);
+      EEPROM.put(201,Incubator_1.routing);
       delay(10);
-      Serial.print(myText[20]);
+     
+      Serial.print(myText[8]); // пишемо в серіал "Routine incubation: "
+      Serial.println(Incubator_1.routing);
       read_routine_feeding();
       }
+  
+  if ((bluetoothCommand == 10)||(NRF_message == 10)||(I2C_message==10))// якщо прийшла команда - 10 включаємо робочий стан інкубатора 
+     {
+          flag_Startincubation=1;
+          EEPROM.put(0,flag_Startincubation);
+           Serial.println(myText[31]); // пишемо в серіал "Start timer deys!"
+           //Serial.print(myText[8]); // пишемо в серіал "Routine incubation: "
+           //read_routine_feeding();
+             
+     }
   if ((bluetoothCommand == 11)||(NRF_message == 11)||(I2C_message==11))// якщо прийшла команда - 11 та реле не активоване то його включаємо 
       { if (digitalRead(RELAY1_PIN)==LOW)
       {digitalWrite(RELAY1_PIN, HIGH );// включаємо вентилятор для нагнітання вологості
