@@ -21,23 +21,23 @@ void read_routine_feeding() {
          //lcd.print(myText[34]);
         Serial.println(myText[34]);
     break;
- case 5:// параметри утримання гуси 
+  case 5:// параметри утримання гуси 
         //lcd.print(myText[39]);
         Serial.println(myText[39]);
     break;
- case 6:// параметри утримання  перепелів 
+  case 6:// параметри утримання  перепелів 
         //lcd.print(myText[36]);
         Serial.println(myText[36]);
     break;
- case 7:// параметри утримання цесарки
+  case 7:// параметри утримання цесарки
         //lcd.print(myText[38]);
         Serial.println(myText[38]);
     break;
- case 8:// параметри утримання фазан
+  case 8:// параметри утримання фазан
         //lcd.print(myText[37]);
         Serial.println(myText[37]);
     break;
- case 9:// параметри утримання ручна
+  case 9:// параметри утримання ручна
         //lcd.print(myText[41]);
         Serial.println(myText[41]);
     break;
