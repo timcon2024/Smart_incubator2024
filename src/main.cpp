@@ -17,7 +17,8 @@ void Mane_menu(); // задаємо функцію для екрана доки 
 void send_Radio_massege(int number);// відправка повідомлення-шифру на шлюз-модуль D
 void receive_I2C_message(); //запит на ESP8266 чи немає команди
 void ton(); // функція озвучки подій
-void check_power();
+void check_power(); //функція обробки переривання 
+void toggleMotor();
 // включити:
 //перевірку чи це перше включення
 //отримати дані з годинника
@@ -50,6 +51,8 @@ void setup() {
   lcd.createChar(1, upArrow);
   lcd.createChar(2, downArrow);
  
+
+ //налаштування портів вводу-виводу
   for (byte i = 4; i < 9; i++)
   {pinMode(i, OUTPUT);
   };           // усі піни з D4 по D8 робимо виходами
@@ -58,8 +61,11 @@ void setup() {
   pinMode(RELAY7_PIN, OUTPUT);// порт для штоку актуатора
   
   pinMode(SENSOR220V_PIN, INPUT_PULLUP);     // (переривання )вхід для сигналу про наявність/відсутність електропостачання(для МК Otmega8, 328 - PD2),
-  attachInterrupt(0, check_power, CHANGE);    //задаємо назву функції і умову її спрацювання (при зміні сигналу в обидва боки)
+  attachInterrupt(5, check_power, CHANGE);    //задаємо назву функції і умову її спрацювання (при зміні сигналу в обидва боки)
    
+   pinMode(ButtonSTOP_PIN, INPUT_PULLUP); // порт преривання від кнопки ручного управління переворотом
+  // Налаштування преривання для кнопки
+  attachInterrupt(4, toggleMotor, FALLING);
   
   
   myPID.SetOutputLimits(10, WindowSize);
@@ -159,8 +165,17 @@ receive_I2C_message();
   int power = 
 
  }
-
+// обробка переривання світло
  void check_power()          {   //функція обробки першого переривання (відключення електроенергії
   Serial.println(warningMessage[13]); // пишемо в серіал, що спрацювала відсутність світла
   flag_power = true;
+}
+// обробка переривання ручного управління переворотом
+
+void toggleMotor() {
+  // Зупинка або відновлення мотора та зміна флагу ручного управління
+  digitalWrite(motorRelay_PIN, !digitalRead(motorRelay_PIN));
+  digitalWrite(actuatorRelay_PIN), !digitalRead(actuatorRelay_PIN)
+
+  manualControl_overturning = !manualControl_overturning;
 }

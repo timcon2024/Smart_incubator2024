@@ -3,7 +3,7 @@
 
 
 void read_readKey ()      {                  
-        readKey = analogRead(A6);
+        readKey = analogRead(A0);
     if (readKey < 790) {
       delay(100);
       readKey = analogRead(A6);
