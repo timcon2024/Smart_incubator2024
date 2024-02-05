@@ -193,7 +193,7 @@ void drawInstruction14()   { //на 14 символ нижнього рядка
   lcd.print(myText[38]);
 }
 void Mane_menu() {        // Основне меню: виводить усю інформацію про стан об'єкту
-  activeButton = 0;
+        activeButton = 0;
   while (activeButton == 0) {
           read_readKey ();
           button = evaluateButton(readKey);
@@ -220,13 +220,13 @@ void Mane_menu() {        // Основне меню: виводить усю і
      } while (timer1 < millis() - PERIOD1); // защита от пропуска шага
       }
   
-  if  (millis() - timer2 >= PERIOD2)          // кожних 5 хв перевіряємо стан
+      if  (millis() - timer2 >= PERIOD2)          // кожних 5 хв перевіряємо стан
      {
         incubator_Control();
     
         //sent_Radio_Data();
         send_warningMessage();
-  do {
+      do {
        timer2 += PERIOD2;
       if (timer2 < PERIOD2) break;  // переполнение uint32_t
      } while (timer2 < millis() - PERIOD2); // защита от пропуска шага
@@ -236,25 +236,25 @@ void Mane_menu() {        // Основне меню: виводить усю і
     
       if (Serial.available() > 0)// перевіряємо наявність нових команд від блютузу 
         {
-    String bufString = Serial.readString();             // читаємо з порту як рядок символів
-    byte dividerIndex = bufString.indexOf(';');           // шукаємо індекс кінця команди
-    String buf = bufString.substring(0, dividerIndex);    // створюємо рядок чисел, від першого числадо індексу кінця комани строку с первым числом
-    delay(10);
-    bluetoothCommand=buf.toInt();                         // перетворюємо  (String  y int) команду в цифровукоманду
-    delay(100);
-    Serial.print(myText[50]); Serial.println(bluetoothCommand) ; // виводимо команду, для відладки 
-    read_bluetoothComand();// запускаємо функцію читання блютуз команди
-   }
+      String bufString = Serial.readString();             // читаємо з порту як рядок символів
+      byte dividerIndex = bufString.indexOf(';');           // шукаємо індекс кінця команди
+      String buf = bufString.substring(0, dividerIndex);    // створюємо рядок чисел, від першого числадо індексу кінця комани строку с первым числом
+      delay(10);
+      bluetoothCommand=buf.toInt();                         // перетворюємо  (String  y int) команду в цифровукоманду
+      delay(100);
+      Serial.print(myText[50]); Serial.println(bluetoothCommand) ; // виводимо команду, для відладки 
+      read_bluetoothComand();// запускаємо функцію читання блютуз команди
+    }
      
       if((NRF_message>0)||(I2C_message>0)) // перевіряємо наявність нових команд від радіо, чи з модуля esp8266
       read_bluetoothComand();
       
       
      
-  }
+    }
     
-  }
-  }
+    }
+}
  void menuItem1() {        // Перше меню : налаштування годинника через кнопки з передачею у пам'ять годинника
   activeButton = 0;
   clockPos = 1;
@@ -658,12 +658,12 @@ void menuItem3() {        // Третє меню: налаштування па�
   clockPos = 1;
   lcd.clear();            // чистимо екран
  // налаштовуємо задану температуру Setpoint, Kp=2, Ki=5, Kd=1.5;
-lcd.setCursor(0, 0);    //
-lcd.print(myText[41]); lcd.print(Setpoint);lcd.println(myText[13]);
+      lcd.setCursor(0, 0);    //
+      lcd.print(myText[41]); lcd.print(Setpoint);lcd.println(myText[13]);
 
-lcd.setCursor(5, 1);
-lcd.print(myText[38]);
-lcd.print(F("   next>>"));
+      lcd.setCursor(5, 1);
+      lcd.print(myText[38]);
+      lcd.print(F("   next>>"));
  while (activeButton == 0) {
     read_readKey();
     button = evaluateButton(readKey);
@@ -869,21 +869,19 @@ lcd.print(F("   next>>"));
    }
  }
 }
- void menuItem4() {        // четверте меню: налаштування таймерів для приладів перевороту актуаторів та приводних моторів
-  activeButton = 0;
-  clockPos = 1;
-  lcd.clear();            // чистимо екран
+ void menuItem4() {        // четверте меню: налаштування таймерів для приладів перевороту актуаторів та приводних моторів  
+    activeButton = 0;
+    clockPos = 1;
+      lcd.clear();            // чистимо екран
  
-lcd.setCursor(0, 0); 
-lcd.print(F("Actuator on: ")); lcd.print(timer_work_ictuator/1000);// час роботи актуатора (час висунення і засунення штоку, прямий і ревесний хід актуатора для перевороту
-lcd.setCursor(0, 1);
-lcd.print(F("Actuator off: ")); lcd.print(timer_interval_incubator/1000);// час перерви між переворотами (час утримання лотка в положенні крайньому правому або лівому
-
-
-lcd.setCursor(4, 1);
-lcd.print(myText[38]);
-lcd.print(F(" minute >>"));
- while (activeButton == 0) {
+    lcd.setCursor(0, 0); 
+    lcd.print(F("Actuator on: ")); lcd.print(timer_work_ictuator/1000);// час роботи актуатора (час висунення і засунення штоку, прямий і ревесний хід актуатора для перевороту
+    lcd.setCursor(0, 1);
+    lcd.print(F("Actuator off: ")); lcd.print(timer_interval_incubator/1000);// час перерви між переворотами (час утримання лотка в положенні крайньому правому або лівому
+    lcd.setCursor(4, 1);
+    lcd.print(myText[38]);
+    lcd.print(F(" minute >>"));
+  while (activeButton == 0) {
     read_readKey();
     button = evaluateButton(readKey);
     switch (button) {

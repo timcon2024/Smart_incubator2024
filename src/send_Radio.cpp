@@ -39,9 +39,50 @@ void send_Radio_message(int number) {
    
 
     // Передавати тривожні повідомлення за потреби
-     
- 
- void sent_warningMessage (){
+    
+void sendAlertMessage(const char* message) {
+  radio.begin(); // Ініціалізація модуля NRF24L01
+  delay (50);
+  // Відправляємо повідомлення
+  bool result = radio.write(message, strlen(message) + 1);
+  
+  if (result) {
+   Serial.print(myText[15]);
+  } else {
+   Serial.println(myText[16]);
+  }
+  
+  radio.powerDown(); // Вимикаємо модуль NRF24L01
+}
+
+void sent_Radio_Data() {
+  radio.powerUp();
+  delay(75);
+  
+  if (!radio.isPVariant()) {
+    flag_Radio = true;
+  } else {
+    flag_Radio = false;
+  }
+  
+  byte dataBytes[sizeof(Incubator)];
+  memcpy(dataBytes, &Incubator, sizeof(Incubator));
+  
+  if (radio.write(dataBytes, sizeof(Incubator))) {
+    if (radio.isAckPayloadAvailable()) {
+      radio.read(&NRF_message, sizeof(NRF_message));
+      delay(75);
+      Serial.print(myText[15]);
+      Serial.println(NRF_message);
+      radio.powerDown();
+    }
+  } else {
+    Serial.println(myText[16]);
+  }
+}
+
+
+ /*void sent_warningMessage (){
   if ((Incubator_1.t > 38.9)||(Incubator_1.t < 37.3))//якщо  температури в інкубаторі вище або нище норми)
   {
     //String warningMessage = warningMessage[9];
@@ -81,4 +122,5 @@ void send_Radio_message(int number) {
   
       
   }
+  */
   

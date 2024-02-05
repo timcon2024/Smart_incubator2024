@@ -21,11 +21,9 @@ unsigned long windowStartTime; // змінна вікна регулювання
 #include "RF24.h"
 RF24 radio(31, 53);                   // створюємо об'єкт з назваю-( "radio") NRF24L01 і порти підключення CE(D31) і SCN(D53) радіомодуля, крім того підключаємо SCK до D52, MO/MOSI до D51, MI/MISO до D50,
 const uint64_t pipe2=0x6868686868LL; // адреса труби
-int flag_Radio;
-int flag_Startincubation;
+
 
 #define DS1307 0x68                 // I2C адрес таймера DS1307
-int flag_Clock; // флаг роботи годинника реального часу 0-працює 1 - не працює
 byte bcdToDec(byte val){ return ( (val/16*10) + (val%16) );}//переводимо в просте десяткове число !byte
 byte decToBcd(byte val){return ( (val/10*16) + (val%10) );}// переводимо в двоїчно-десяткове
 
@@ -57,70 +55,94 @@ float Tmax,Tmin,Hmin,Hmax,twmax,twmin;
                        //встановлення таймерів роботи додаткового обладнання, "переведення сенсорів їх коректування)
 int maxMenuPages = round(((sizeof(menuItems) / sizeof(String)) / 2) + .5);  //Переменная для кнопок навигации
  
-#include <OneWire.h>                // бібліотека для роботи з протоколом OneWire 
-OneWire ds(24);                     // порт (А0=D14) сенсорів DS18b20
+#include <OneWire.h>                  // бібліотека для роботи з протоколом OneWire 
+OneWire ds(24);                       // порт (А0=D14) сенсорів DS18b20
 //#define PERIOD2 123000
 uint32_t timer1 = 0;
-uint32_t timer2 = 0;              // таймер 
+uint32_t timer2 = 0;                  // таймер 
 
-LiquidCrystal lcd(8, 9, 4, 5, 6, 7);//Инициализация LCD Keypad shield
+LiquidCrystal lcd(8, 9, 4, 5, 6, 7);  //  Инициализация LCD Keypad shield
 int ledDisplay = 10;   
 
-#define PERIOD1 63000               // 1000*60*2період для виконання функції виведення даних на LCD 1602 і в Serial
+#define PERIOD1 63000                 //  1000*60*2період для виконання функції виведення даних на LCD 1602 і в Serial
 // опис портів
-#define SENSOR220V_PIN 2             // порт D2 - порт переривання наявність 220 вольт
-#define ButtonSTOP_PIN 3              // порт переривання для примусової зупинки перевороту
-#define RELAY1_PIN 34                // порт D4  r1 - сигнальний провід до реле (5/220) (твердотільне) (в ванночці розпилючач або вентилятор-кулер)
-#define RELAY2_PIN 11                //ШИМ// порт D5  r2 - сигнальний провід до реле(5/220) (твердотільне) (PID) - головний нагріваючий прилад (шнур 60 Om) шим опалення: тепловентилятор, калорифер або нагрів повітря карбоновий шнур
-#define RELAY3_PIN 12                //ШИМ// порт D6  r3 - сигнальний провід до реле(5/220) (твердотільне) (ШИМ) - головний вентилятор змішування повітря шим циркуляція повітря: вентилятор для перемішування повітря (циркуляція)    
-#define RELAY4_PIN 35                // порт D7  r4 - сигнальний провід до реле(5/220) (електромеханічне) прямий нагрів (для розігріву) додаткове опалення: тен або лампи накалювання(в т.ч. як страховка) розігріву інкубатора
-#define RELAY5_PIN 36               // порт D8  r5 -  сигнальний провід до реле(5/220) (електромеханічне) витяжного вентилятора провітрювання і охолодження (скидання жари) вентилятори швидкого охородження
-#define Water_level A1              // порт A1 - рівень води в зволожувачі аналоговий сигнал для шкали у відсотках       
-#define PIN_PHOTO_SENSOR A2         // фоторезистор
-#define SENSOR_LM35_PIN A3          // аналоговий датчик температури на платі
-#define tonePin 44                   // порт 44 - ШИМ бузер
+#define SENSOR220V_PIN 2              //  порт D2 - порт переривання для флага наявності 220 вольт
+#define ButtonSTOP_MOTOR_PIN 3              //  порт переривання  D3 для флага примусової зупинки перевороту
+#define ButtonLIGHT_PIN 19             //  порт переривання D19 для флага включення, виключення світла примусової зупинки перевороту
+
+#define RELAY1_PIN 34                 //  порт D34  r1 - сигнальний провід до реле (5/220) (твердотільне) (в ванночці розпилючач або вентилятор-кулер)
+#define RELAY2_PIN 11                 //  ШИМ// порт D11  r2 - сигнальний провід до реле(5/220) (твердотільне) (PID) - головний нагріваючий прилад (шнур 60 Om) шим опалення: тепловентилятор, калорифер або нагрів повітря карбоновий шнур
+#define RELAY3_PIN 12                 //  ШИМ// порт D12  r3 - сигнальний провід до реле(5/220) (твердотільне) (ШИМ) - головний вентилятор змішування повітря шим циркуляція повітря: вентилятор для перемішування повітря (циркуляція)    
+#define RELAY4_PIN 35                 //  порт D35  r4 - сигнальний провід до реле(5/220) (електромеханічне) прямий нагрів (для розігріву) додаткове опалення: тен або лампи накалювання(в т.ч. як страховка) розігріву інкубатора
+#define RELAY5_PIN 36                 //  порт D36  r5 -  сигнальний провід до реле(5/220) (електромеханічне) витяжного вентилятора провітрювання і охолодження (скидання жари) вентилятори швидкого охородження
+#define RELAY6_PIN 37                 //   порт D37  r6 -  сигнальний провід до реле(5/220) (електромеханічне) включ/викл. світла в інкубаторі в ручному режимі
 
 
-#define actuatorRelay_PIN 41               //  порт A2-D16 - сигнальний провід до реле(5/220) порт для актуатора 
-#define motorRelay_PIN 43               // порт A3-D16 сигнальний провід до реле(5/220) порт для мотора лотка  
+#define reservRele1_PIN 38             // порт D38 резервний для (r1)   - зволоження      
+#define reservRele2_PIN 45            // порт  D45 ШИМ резервний для (r2) - основний нагрів
+#define reservRele3_PIN 46            // порт  D46 ШИМ резервний для (r3) - міксер повітря
+#define reservRele4_PIN 40            // порт  D40 резервний для (r4) - додатковий нагрів
+#define reservRele5_PIN 42            // порт  D42 резервний для (r5) - витяжний вентилятор
+#define reservReleMOTOR_PIN 43        // порт  D43 резервний для (мотору перевороту і актуатора)
 
-volatile bool manualControl_overturning = false; // флаг для ручного перевороту лотка (для проведення маніпуляцій)
-volatile bool flag_power,flag_Watter_Box,//флаги роботи електрики,  наявності води у зволожувачі
- flag_sensor_Si7021, // флаг наявності і справності сенсора Si7021
-  flag_sensor_eggs,// флаг наявності і справності сенсора DS18b20 на яйці
-  flag_sensorWatterBox,// флаг наявності і справності сенсора DS18b20 в ванні нагнітання вологості
-  flag_sensor_module, // флаг наявності і справності сенсора DS18b20 на модулі реального часу DS1307 
-  flag_RELAY1, flag_RELAY2,flag_RELAY3,flag_RELAY4,flag_RELAY5,flag_RELAY6; //флаги релейних модулів
-unsigned long timer_interval_incubator; // перерва між поданням на реле актуатор (мотор) сигналу включення подачі електроенергії 
-const char* warningMessage[]   =  {     // тривожні повідомлення
- "ClockRTC1307 OFF",         //   1       30
-  "Sensor Si7021 OFF! ",      //   2       30 
-  "Sensor eggs OFF! ",        //   3       30
-  "Sensor modul OFF",         //   4       32
-  "Sensor waterTenck OFF",    //   5       30
-  "NO water in Tank",         //   6       32
-  "Sensor СО2 OFF",           //   7       30
-  "Warning! Door open! ",     //   8       30
-  "Warning! Temp critical!",  //   9       30
-  "Warning! Temp egg critical!", //   10    30
-  "Warning! Hum critical!",   //   11       30
-  "Warning! CO2 critical!",   //   12       30
-  "Warning! 220! OFF!",       //   13       30
-  "Warning! tmodule critical!" // 14       20
-  
- };
-const char* myText[]   =  {               // об'являємо масив рядків англійських команд-повідомлень
-                                                  //   номер. байт.
-  "RadioNRF24L01 OFF",         //  0       32
-  "ClockRTC1307 OFF",         //   1       30
-  "Sensor DHT OFF! ",         //   2       30 
+#define Water_level A1                //  порт A1 - рівень води в зволожувачі аналоговий сигнал для шкали у відсотках       
+#define PIN_PHOTO_SENSOR A2           //  фоторезистор
+#define SENSOR_LM35_PIN A3            //  аналоговий датчик температури на платі
+#define tonePin 44                    //  порт 44 - ШИМ бузер
+
+
+#define actuatorRelay_PIN 39           //  порт D41 - сигнальний провід до реле(5/220) порт для актуатора 
+#define motorRelay_PIN 41              // порт D43  -   сигнальний провід до реле(5/220) порт для мотора лотка  
+
+volatile bool flag_Radio,               // флаг стану радіо
+flag_Startincubation,                   // флаг роботи інкубатора: folse - режим опитування сенсорів (підготовка до роботи) і true - режим повної роботи
+flag_Clock,                               // флаг роботи годинника реального часу 0-працює 1 - не працює
+flag_manualControl_overturning,           // флаг для ручного перевороту лотка (для проведення маніпуляцій)
+flag_power,                               //флаги наявності 220 вольт в мережі електрики,
+flag_Watter_Box,                          //флаги наявності води у зволожувачі (у баці)
+flag_manual_light,                        //флаги роботи світла в інкубпторі,  
+flag_sensor_Si7021,                       // флаг наявності і справності сенсора Si7021
+flag_sensor_eggs,                         // флаг наявності і справності сенсора DS18b20 на яйці
+flag_sensorWatterBox,                     // флаг наявності і справності сенсора DS18b20 в ванні нагнітання вологості
+flag_sensor_module,                       // флаг наявності і справності сенсора DS18b20 на модулі реального часу DS1307 
+flag_RELAY1, flag_RELAY2,flag_RELAY3,flag_RELAY4,flag_RELAY5,flag_RELAY6; //флаги релейних модулів
+
+unsigned long timer_interval_incubator;   // перерва між поданням на реле актуатор (мотор) сигналу включення подачі електроенергії 
+const char* warningMessage[]   =  {       // тривожні повідомлення
+  "Radio_NRF OFF"                         //   0       12
+  "Clock_RTC1307 OFF",                    //   1       30
+  "Sensor_Si7021 OFF! ",                  //   2       30 
+  "Sensor_eggs OFF! ",                    //   3       30
+  "Sensor_modul OFF!",                    //   4       32
+  "Sensor_waterTenck OFF!",               //   5       30
+  "NO water in Tank!",                    //   6       32
+  "Sensor_СО2 OFF",                       //   7       30
+  "Warning! Door open! ",                 //   8       30
+  "Warning! Temp critical!",              //   9       30
+  "Warning! Temp egg critical!",          //   10      30
+  "Warning! Hum critical!",               //   11      30
+  "Warning! CO2 critical!",               //   12      30
+  "Warning! 220! OFF!",                   //   13      30
+  "Warning! tmodule critical!",           //   14      20
+  "Warning! manual_motor",                //   15      21 
+  "Warning! Light_manual"                 //   16
+  "Alarm! Motor_overturning no fund!",    //   17
+  "Alarm! Actuator_overturning no fund!", //   18
+  "Alarm! Light no fund!"                 //   19
+  };
+
+  const char* myText[]   =  {               //          об'являємо масив рядків англійських команд-повідомлень
+                                          //   номер. байт.
+  "",         //  0       32
+  "",         //   1       30
+  "",         //   2       30 
   "Temp: ",                   //   3       30
-  "Sensor modul OFF",         //   4      32
-  "Sensor Water OFF",         //   5       30
+  "",         //   4      32
+  "",         //   5       30
   "NO water in Tank",         //   6      32
-  "NO food in Feeder",         //  7      30
-  "Warning! ALARM! ",         //   8       30
-  "Warning! 220! ",           //   9       30
+  "",         //  7      30
+  " ",         //   8       30
+  " ",           //   9       30
   "I2C sent: ",              //   10      28
   " TIM&Co.UA.2021 ",         //  11
   "IDE:" ,                    //  12
@@ -194,7 +216,7 @@ struct Incubator {  //27 байти           //структура для пер
   byte Si7021;    // стан роботи сенсора вологості і температури
   byte DS18b20;   // стан роботи  шини датчиків
   byte RTC_ds1307;   // стан роботи  годинника реального часу
-};//typedef struct package Package;
+};
 Incubator Incubator_1;
 byte downArrow[8] =  { //стрілка вниз
   0b00100, //   *

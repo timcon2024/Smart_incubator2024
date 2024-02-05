@@ -38,5 +38,6 @@ void GET_DateTime() {
     }
   } else {
     flag_Clock = 1; // підняття флагу помилки у випадку відсутності відповіді від DS1307
+    Serial.println(warningMessage[15]); // пишемо в серіал, що
   }
 }

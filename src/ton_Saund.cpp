@@ -61,8 +61,33 @@ tone(tonePin,392, 350);
  }
   else if (flag_power)
   {
-    /* code */
+    /* пікання довго 1 раз в циклі про відсутність 220% */
+  tone(tonePin, 330, 1000);
   }
   
+   else if (flag_sensor_Si7021) // поломка сенсора температури головного
+  {
+    /* пікання дуже швидке 3 рази в секуду в про поломку сенсора */
+  tone(tonePin, 330, 330);
+  delay(250);
+   tone(tonePin, 330, 330);
+  delay(250);
+   tone(tonePin, 330, 330);
+  delay(250);
+   tone(tonePin, 330, 330);
+  delay(250);
+   tone(tonePin, 330, 330);
+  delay(250);
+  }
+   else if (flag_Watter_Box) // відсутня вода в баці для зволоження
+  {
+    /* пікання середнє про відсутність води */
+  tone(tonePin, 330, 530);
+  delay(250);
+   tone(tonePin, 330, 530);
+  delay(250);
+   tone(tonePin, 330, 530);
+  delay(250);
   
+  }
 }

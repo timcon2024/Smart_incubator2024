@@ -57,9 +57,9 @@
  *          розпиновка MEGA2560// https://microtechnics.ru/arduino-mega-2560-r3-raspinovka-i-princzipialnaya-shema/
  *                                AREF
  *                                GND
- *                                D13   PWM (підключений світлодіод)
- *  Reset                         D12   PWM
- *  3,3V                          D11   PWM
+ *                                D13   PWM 	(підключений світлодіод на платі)
+ *  Reset                         D12   PWM		реле 3 змішувач повітря головний вентилятор
+ *  3,3V                          D11   PWM  	реле 2 опалення гoловне
  *  5V                            D10   PWM   LCD Shild установка яркості дисплея
  *  GND                           D9    PWM   LCD SHild
  *  GND                           D8    PWM   LCD SHild
@@ -67,38 +67,38 @@
  *  A0 (D54)-Меню                 D6    PWM   LCD SHild
  *  A1 (D55) сенсор рівня води    D5    PWM   LCD SHild
  *  A2 (D56) - фоторез на платі   D4    PWM   LCD SHild
- *  A3 (D57) - датчик LM 35       D3    PWM   ButtonSTOP_PIN
- *  A4 (D58)                      D2    PWM   контроль наявності електроенергії преривание
- *  A5 (D59)                      D1   	TX   USART0  
- *  A6 (D60)                      D0   	RX   USART0  
- *  A7 (D61)                      D14  	TX   USART3
- *  A8 (D62)                      D15  	RX   USART3 
- *  A9 (D63)                      D16  	TX   USART2 
- *  A10(D64)                      D17  	RX   USART2      
- *  A11(D65)                      D18  	TX   USART1 шина до esp 
- *  A12(D66)                      D19  	RX   USART1 шина до esp 
- *  A13(D67)                      D20 	CDA (I2C)   шина I2C від esp
- *  A14(D68)                      D21 	SCL (I2C)   шина I2C від esp
+ *  A3 (D57) - датчик LM 35       D3    PWM   перериваня INT5, кнопка флага ButtonSTOP_PIN
+ *  A4 (D58)                      D2    PWM   перериваня INT4, контроль наявності електроенергії преривание
+ *  A5 (D59)                      D1   	TX    USART0 (підключений світлодіод на платі) 
+ *  A6 (D60)                      D0   	RX    USART0  (підключений світлодіод на платі)
+ *  A7 (D61)                      D14  	TX    USART3
+ *  A8 (D62)                      D15  	RX    USART3 
+ *  A9 (D63)                      D16  	TX    USART2  шина до esp 
+ *  A10(D64)                      D17  	RX    USART2  шина до esp   
+ *  A11(D65)                      D18  	TX    USART1 перериваня INT3,
+ *  A12(D66)                      D19  	RX    USART1 перериваня INT2, кнопка флага світла в інкубаторі
+ *  A13(D67)                      D20 	CDA   (I2C)   перериваня INT1, шина I2C від esp
+ *  A14(D68)                      D21 	SCL   (I2C)   перериваня INT0, шина I2C від esp
  *  A15(D69)
  
- * <бокові піни:                  5V
- * D22        		              D23 DS18B20
- * D24                            D25  
- * D26                            D27  
- * D28  					      D29
- * D30                            D31   CE NRF24L01
- * D32                            D33
- * D34   реле 1 (зволоження)      D35 реле 2 опалення гловне
- * D36   реле 3                   D37 реле 4 
- * D38   реле 5                   D39 реле 6
- * D40   			              D41
- * D42                            D43
- * D44   *PWM 5V                  D45 *PWM 5V
- * D46   *PWM 5V                  D47
- * D48   ICP                      D49 	ICP
- * D50 	 MISO NRF24L01            D51   MOSI NRF24L01
- * D52 	 SCK NRF24L01             D53   CSN(SS) NRF24L01
- * GND                            GND
+ * <бокові піни:                  				5V
+ * D22   сенсор DHT11/резервний    		 		D23 DS18B20
+ * D24                            				D25  
+ * D26                            				D27  
+ * D28  					     				D29
+ * D30                           				D31   CE NRF24L01
+ * D32                            				D33
+ * D34   реле 1 (зволоження)      				D35 реле 4 (додатковий нагрів через повітряний ТЄН)
+ * D36   реле 5 (витяжка)		  				D37 реле 6 (світло в інкубаторі)
+ * D38   (резевне реле1,св-зволоження)          D39 реле 7 (переворот мотор лотка)
+ * D40   (резервне реле4,св-додатковий нагрів)	D41 реле 8 (переворот мотор актуатора)
+ * D42   (резевне реле5 св витяжка)        		D43 резервне реле для 7,8 (перевороту-реверс)
+ * D44   *PWM 5V  tonePin         				D45 *PWM 5V -резервне реле2 ШИМ для нагріву
+ * D46   *PWM 5V (резевне реле3, св - міксер)  	D47
+ * D48   ICP                      				D49 	ICP
+ * D50 	 MISO NRF24L01            				D51   MOSI NRF24L01
+ * D52 	 SCK NRF24L01             				D53   CSN(SS) NRF24L01
+ * GND                            				GND
  
 
 
