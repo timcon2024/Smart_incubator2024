@@ -3,10 +3,10 @@
 
 
 void read_readKey ()      {                  
-        readKey = analogRead(A0);
+        readKey = analogRead(Button_menu);
     if (readKey < 790) {
       delay(100);
-      readKey = analogRead(A6);
+      readKey = analogRead(Button_menu);
      }                
 }
 // збереження даних
@@ -170,6 +170,7 @@ int evaluateButton(int x) {
   }
   return result;
 }
+
     //Встановлення стрілки і курсора на години, день місяця
 void drawInstruction5()   {// стрілка на 5 символ нижнього рядка
   lcd.setCursor(0, 1);
@@ -203,51 +204,53 @@ void Mane_menu() {        // Основне меню: виводить усю і
             activeButton = 1;
             break;
         
-        default:
+    default:
       // усі функції контролю і моніторингу тут:
        
-        if  (millis() - timer1 >= PERIOD1)          // кожних 5 хв перевіряємо стан
-     {
+      if  (millis() - timer1 >= PERIOD1)          // кожних 5 хв перевіряємо стан
+        {
         GET_DateTime();
         sensors_read();
         send_Lcd_Clock();
         send_LCD_sensors();
         parameter_control();
         send_incubator_1I2C();
-      do {
-       timer1 += PERIOD1;
+            do {
+        timer1 += PERIOD1;
+      
       if (timer1 < PERIOD1) break;  // переполнение uint32_t
-     } while (timer1 < millis() - PERIOD1); // защита от пропуска шага
-      }
+           } while (timer1 < millis() - PERIOD1); // защита от пропуска шага
+        }
   
       if  (millis() - timer2 >= PERIOD2)          // кожних 5 хв перевіряємо стан
-     {
+        {
         incubator_Control();
     
         //sent_Radio_Data();
         send_warningMessage();
-      do {
+            do {
        timer2 += PERIOD2;
+      
       if (timer2 < PERIOD2) break;  // переполнение uint32_t
-     } while (timer2 < millis() - PERIOD2); // защита от пропуска шага
-      }
+            } while (timer2 < millis() - PERIOD2); // защита от пропуска шага
+        }
        
        
     
       if (Serial.available() > 0)// перевіряємо наявність нових команд від блютузу 
         {
-      String bufString = Serial.readString();             // читаємо з порту як рядок символів
-      byte dividerIndex = bufString.indexOf(';');           // шукаємо індекс кінця команди
-      String buf = bufString.substring(0, dividerIndex);    // створюємо рядок чисел, від першого числадо індексу кінця комани строку с первым числом
-      delay(10);
-      bluetoothCommand=buf.toInt();                         // перетворюємо  (String  y int) команду в цифровукоманду
-      delay(100);
-      Serial.print(myText[50]); Serial.println(bluetoothCommand) ; // виводимо команду, для відладки 
-      read_bluetoothComand();// запускаємо функцію читання блютуз команди
-    }
+        String bufString = Serial.readString();             // читаємо з порту як рядок символів
+        byte dividerIndex = bufString.indexOf(';');           // шукаємо індекс кінця команди
+        String buf = bufString.substring(0, dividerIndex);    // створюємо рядок чисел, від першого числадо індексу кінця комани строку с первым числом
+        delay(10);
+        bluetoothCommand=buf.toInt();                         // перетворюємо  (String  y int) команду в цифровукоманду
+        delay(100);
+        Serial.print(myText[50]); Serial.println(bluetoothCommand) ; // виводимо команду, для відладки 
+        read_bluetoothComand();// запускаємо функцію читання блютуз команди
+        }
      
-      if((NRF_message>0)||(I2C_message>0)) // перевіряємо наявність нових команд від радіо, чи з модуля esp8266
-      read_bluetoothComand();
+      if((NRF_message>0)||(I2C_message>0)||(I2C_message)) // перевіряємо наявність нових команд від радіо, чи з модуля esp8266
+        read_Comand();
       
       
      

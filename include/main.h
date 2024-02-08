@@ -85,6 +85,7 @@ int ledDisplay = 10;
 #define reservRele5_PIN 42            // порт  D42 резервний для (r5) - витяжний вентилятор
 #define reservReleMOTOR_PIN 43        // порт  D43 резервний для (мотору перевороту і актуатора)
 
+#define Button_menu A0                // порт для налаштування модуля через меню на LCD1602
 #define Water_level A1                //  порт A1 - рівень води в зволожувачі аналоговий сигнал для шкали у відсотках       
 #define PIN_PHOTO_SENSOR A2           //  фоторезистор
 #define SENSOR_LM35_PIN A3            //  аналоговий датчик температури на платі
