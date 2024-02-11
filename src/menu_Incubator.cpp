@@ -224,10 +224,10 @@ void Mane_menu() {        // Основне меню: виводить усю і
   
       if  (millis() - timer2 >= PERIOD2)          // кожних 5 хв перевіряємо стан
         {
-        incubator_Control();
+       
     
-        //sent_Radio_Data();
-        send_warningMessage();
+        sent_Radio_Data();
+      sent_Str_I2c();
             do {
        timer2 += PERIOD2;
       
@@ -267,7 +267,7 @@ void Mane_menu() {        // Основне меню: виводить усю і
   lcd.print(myText[38]);        //  стрілка на 10 ячейці
  
                           // цикл для налаштування годинника (без секунд)
- while (activeButton == 0) {
+  while (activeButton == 0) {
     read_readKey();
     button = evaluateButton(readKey);
          //Позиція курсора, : 1-день року, 2-місяць року, 3-номер року,4- година, 5-хвилина 

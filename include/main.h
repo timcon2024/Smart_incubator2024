@@ -53,7 +53,7 @@ float Tmax,Tmin,Hmin,Hmax,twmax,twmin;
  String menuItems[] = {"Clock", "Start module", "Parametrs", "Device Timers",};
                        // налаштування годинника, встановлення таймеру нагадування, встановлення параметрів контролю, 
                        //встановлення таймерів роботи додаткового обладнання, "переведення сенсорів їх коректування)
-int maxMenuPages = round(((sizeof(menuItems) / sizeof(String)) / 2) + .5);  //Переменная для кнопок навигации
+int maxMenuPages = round(((sizeof(menuItems)/sizeof(String))/2) + .5);  //Переменная для кнопок навигации
  
 #include <OneWire.h>                  // бібліотека для роботи з протоколом OneWire 
 OneWire ds(24);                       // порт (А0=D14) сенсорів DS18b20
@@ -62,7 +62,7 @@ uint32_t timer1 = 0;
 uint32_t timer2 = 0;                  // таймер 
 
 LiquidCrystal lcd(8, 9, 4, 5, 6, 7);  //  Инициализация LCD Keypad shield
-int ledDisplay = 10;   
+int ledDisplay = 10;                  // порт світлодіода на платі 
 
 #define PERIOD1 63000                 //  1000*60*2період для виконання функції виведення даних на LCD 1602 і в Serial
 // опис портів
@@ -76,7 +76,8 @@ int ledDisplay = 10;
 #define RELAY4_PIN 35                 //  порт D35  r4 - сигнальний провід до реле(5/220) (електромеханічне) прямий нагрів (для розігріву) додаткове опалення: тен або лампи накалювання(в т.ч. як страховка) розігріву інкубатора
 #define RELAY5_PIN 36                 //  порт D36  r5 -  сигнальний провід до реле(5/220) (електромеханічне) витяжного вентилятора провітрювання і охолодження (скидання жари) вентилятори швидкого охородження
 #define RELAY6_PIN 37                 //   порт D37  r6 -  сигнальний провід до реле(5/220) (електромеханічне) включ/викл. світла в інкубаторі в ручному режимі
-
+#define actuatorRelay_PIN 39           //  порт D41 - сигнальний провід до реле(5/220) порт для актуатора 
+#define motorRelay_PIN 41              // порт D43  -   сигнальний провід до реле(5/220) порт для мотора лотка  
 
 #define reservRele1_PIN 38             // порт D38 резервний для (r1)   - зволоження      
 #define reservRele2_PIN 45            // порт  D45 ШИМ резервний для (r2) - основний нагрів
@@ -92,8 +93,6 @@ int ledDisplay = 10;
 #define tonePin 44                    //  порт 44 - ШИМ бузер
 
 
-#define actuatorRelay_PIN 39           //  порт D41 - сигнальний провід до реле(5/220) порт для актуатора 
-#define motorRelay_PIN 41              // порт D43  -   сигнальний провід до реле(5/220) порт для мотора лотка  
 
 volatile bool flag_Radio,               // флаг стану радіо
 flag_Startincubation,                   // флаг роботи інкубатора: folse - режим опитування сенсорів (підготовка до роботи) і true - режим повної роботи
@@ -106,7 +105,7 @@ flag_sensor_Si7021,                       // флаг наявності і сп
 flag_sensor_eggs,                         // флаг наявності і справності сенсора DS18b20 на яйці
 flag_sensorWatterBox,                     // флаг наявності і справності сенсора DS18b20 в ванні нагнітання вологості
 flag_sensor_module,                       // флаг наявності і справності сенсора DS18b20 на модулі реального часу DS1307 
-flag_RELAY1, flag_RELAY2,flag_RELAY3,flag_RELAY4,flag_RELAY5,flag_RELAY6; //флаги релейних модулів
+flag_RELAY1, flag_RELAY2,flag_RELAY3,flag_RELAY4,flag_RELAY5,flag_RELAY6,flag_actuatorRelay, flag_motorRelay; //флаги релейних модулів
 
 unsigned long timer_interval_incubator;   // перерва між поданням на реле актуатор (мотор) сигналу включення подачі електроенергії 
 const char* warningMessage[]   =  {       // тривожні повідомлення
@@ -132,7 +131,7 @@ const char* warningMessage[]   =  {       // тривожні повідомле
   "Alarm! Light no fund!"                 //   19
   };
 
-  const char* myText[]   =  {               //          об'являємо масив рядків англійських команд-повідомлень
+const char* myText[]   =  {               //          об'являємо масив рядків англійських команд-повідомлень
                                           //   номер. байт.
   "",         //  0       32
   "",         //   1       30
@@ -167,35 +166,36 @@ const char* warningMessage[]   =  {       // тривожні повідомле
   "SAVE settings...." ,       //  30
   "Start timer deys!" ,       //  31
  "C;",                        //  32
-"Brooler ",                   //  33
-"Tyrken  ",                   //  34
-"Duck    ",                   //  35
-"Quail   ",                   //  36
-"Pheasan ",                   //  37
-"Numida  ",                   //  38
-"Anser   ",                   //  39
-"Chicken  ",                  //  40
-"Manual  ",                   //  41
-"Restart module...",           // 42
-"Warning! MOTOR!",            //  43
-"Warning! Vaccination!",      //  44
-"t water: ",                    //45
-"t module: ",                   //46
-"Temp sensors: ",               //47
-"RadioNRF24L01 OK!:",           //48
-"ClockRTC1307 OK!:",            //49
-"bluetoothCommand:",            //50
-"                ",             //51
-"\1",                           //52
-"   Thank you!,   ",            //53
-"Tmax:",                        //54
-"Tmin:",                        //55
-"Hmax:",                        //56
-"Hmin:",                        // 57
-"twmax",                        //58
-"gzmax",                        //59
-"I2C no sent!"                  //60
-};
+ "Brooler ",                   //  33
+ "Tyrken  ",                   //  34
+ "Duck    ",                   //  35
+ "Quail   ",                   //  36
+ "Pheasan ",                   //  37
+ "Numida  ",                   //  38
+ "Anser   ",                   //  39
+ "Chicken  ",                  //  40
+ "Manual  ",                   //  41
+ "Restart module...",           // 42
+ "Warning! MOTOR!",            //  43
+ "Warning! Vaccination!",      //  44
+ "t water: ",                    //45
+ "t module: ",                   //46
+ "Temp sensors: ",               //47
+ "RadioNRF24L01 OK!:",           //48
+ "ClockRTC1307 OK!:",            //49
+ "bluetoothCommand:",            //50
+ "                ",             //51
+ "\1",                           //52
+ "   Thank you!,   ",            //53
+ "Tmax:",                        //54
+ "Tmin:",                        //55
+ "Hmax:",                        //56
+ "Hmin:",                        // 57
+ "twmax",                        //58
+ "gzmax",                        //59
+ "I2C no sent!"                  //60
+ }; 
+ 
 struct Incubator {  //27 байти           //структура для передачі даних з курника на центропульт
   float t;          // температура
   float h;          // вологість

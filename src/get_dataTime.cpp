@@ -31,13 +31,15 @@ void GET_DateTime() {
   if (status == 0) {  // перевірка статусу зв'язку з DS1307
     int i = 0;                       // індекс для даного елементу
     Wire.requestFrom(DS1307, 7);     // запит 7 байтів з DS1307
-     flag_Clock = 0;
+     flag_Clock = false;
     while (Wire.available()) {
       dateTime[i] = Wire.read();   // читання 1 байта та збереження в масив dateTime
       i++;
     }
   } else {
-    flag_Clock = 1; // підняття флагу помилки у випадку відсутності відповіді від DS1307
+    flag_Clock = true; // підняття флагу помилки у випадку відсутності відповіді від DS1307
     Serial.println(warningMessage[15]); // пишемо в серіал, що
   }
+
+
 }
